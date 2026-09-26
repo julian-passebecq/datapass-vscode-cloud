@@ -10,11 +10,11 @@ test('file and depth limits report partial rather than complete',async t=>{
 });
 test('unreadable root fails instead of inventing an empty verified project',async()=>{await assert.rejects(h.scanFolder('/does-not-exist-cloud-studio',1));});
 test('safeFile confines opens and rejects traversal or symbolic links',async t=>{
- const root=await temp(t);await fs.writeFile(path.join(root,'a.py'),'x');assert.equal(await h.safeFile(root,'a.py'),path.join(root,'a.py'));await assert.rejects(h.safeFile(root,'../a.py'));
+ const root=await temp(t);await fs.writeFile(path.join(root,'a.py'),'x');assert.equal(await h.safeFile(root,'a.py'),await fs.realpath(path.join(root,'a.py')));await assert.rejects(h.safeFile(root,'../a.py'));
  if(process.platform!=='win32'){await fs.symlink(path.join(root,'a.py'),path.join(root,'link.py'));await assert.rejects(h.safeFile(root,'link.py'));const out=await h.scanFolder(root,1);assert.equal(out.scan,'partial');assert.equal(out.files.length,1);}
 });
-test('parent link swap after scan cannot open an outside file',async t=>{
- if(process.platform==='win32')return;const root=await temp(t),outside=await temp(t);await fs.writeFile(path.join(outside,'a.py'),'secret');await fs.symlink(outside,path.join(root,'child'));await assert.rejects(h.safeFile(root,'child/a.py'));
+test('parent link swap after scan cannot open an outside file',{skip:process.platform==='win32' ? 'Symlink creation needs separate Windows qualification' : false},async t=>{
+ const root=await temp(t),outside=await temp(t);await fs.writeFile(path.join(outside,'a.py'),'secret');await fs.symlink(outside,path.join(root,'child'));await assert.rejects(h.safeFile(root,'child/a.py'));
 });
 test('large source files require native manual open',async t=>{const root=await temp(t);await fs.writeFile(path.join(root,'large.py'),Buffer.alloc(2*1024*1024+1));await assert.rejects(h.safeFile(root,'large.py'),/2 MiB/);});
 test('PATH entries must be absolute, cross-platform',()=>{assert.deepEqual(h.absoluteEntries(':/usr/bin:.:relative:/bin','linux'),['/usr/bin','/bin']);assert.deepEqual(h.absoluteEntries(';.;relative;C:\\Tools;"C:\\Program Files\\Tool";\\Windows','win32'),['C:\\Tools','C:\\Program Files\\Tool']);});
