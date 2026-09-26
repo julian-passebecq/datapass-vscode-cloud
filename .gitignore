@@ -1,0 +1,8 @@
+node_modules/
+dist/
+artifacts/
+.ci-tools/
+.vscode-test/
+__pycache__/
+*.vsix
+*.log

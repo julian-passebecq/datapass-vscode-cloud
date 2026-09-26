@@ -1,0 +1,47 @@
+{
+  "name": "datapass-vscode-cloud",
+  "displayName": "DataPass Cloud Studio",
+  "description": "An independent, task-first guide to Fabric, Power BI and Azure tools. Native files, useful journeys, optional AI. No DataPass required.",
+  "version": "0.1.0",
+  "publisher": "julian-passebecq",
+  "license": "UNLICENSED",
+  "engines": { "vscode": "^1.106.0", "node": ">=20" },
+  "categories": ["Data Science", "Other"],
+  "keywords": ["Fabric", "Power BI", "Azure", "MCP", "toolkit"],
+  "repository": { "type": "git", "url": "https://github.com/julian-passebecq/datapass-vscode-cloud.git" },
+  "main": "./dist/extension.cjs",
+  "extensionKind": ["workspace"],
+  "activationEvents": ["onView:cloudStudio.explorer"],
+  "capabilities": {
+    "untrustedWorkspaces": { "supported": "limited", "description": "Guides and extension metadata work without trust. CLI probes, native-tool launch and project context export require a trusted workspace." },
+    "virtualWorkspaces": { "supported": false, "description": "Version 0.1 supports local desktop workspaces. Remote host qualification is pending." }
+  },
+  "contributes": {
+    "commands": [
+      { "command": "cloudStudio.open", "title": "Cloud Studio: Open Studio", "icon": "$(cloud)" },
+      { "command": "cloudStudio.refresh", "title": "Cloud Studio: Refresh Local Context", "icon": "$(refresh)" },
+      { "command": "cloudStudio.chooseFolder", "title": "Cloud Studio: Choose Working Folder", "icon": "$(folder-opened)" },
+      { "command": "cloudStudio.checkTools", "title": "Cloud Studio: Check CLI Versions (Local Only)" },
+      { "command": "cloudStudio.context", "title": "Cloud Studio: Preview Context for My AI" }
+    ],
+    "viewsContainers": { "activitybar": [{ "id": "cloudStudio", "title": "Cloud Studio", "icon": "media/cloud.svg" }] },
+    "views": { "cloudStudio": [{ "id": "cloudStudio.explorer", "name": "Cloud Studio" }] },
+    "menus": {
+      "view/title": [{ "command": "cloudStudio.open", "when": "view == cloudStudio.explorer", "group": "navigation" }, { "command": "cloudStudio.refresh", "when": "view == cloudStudio.explorer", "group": "navigation" }],
+      "editor/title/context": [{ "command": "cloudStudio.context", "when": "resourceScheme == file", "group": "cloudStudio" }]
+    },
+    "configuration": { "title": "Cloud Studio", "properties": {
+      "cloudStudio.presentation": { "type": "string", "enum": ["guided", "compact"], "default": "guided", "description": "Presentation only. Does not change permissions, tool configuration or project files." }
+    } }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node scripts/build.cjs",
+    "test": "node --test tests/*.test.cjs",
+    "verify": "npm run build && npm test && node scripts/check.cjs",
+    "package": "npm run verify && python3 scripts/package.py",
+    "preview": "node scripts/preview.cjs",
+    "test:ui": "python3 tests/browser.py",
+    "test:vscode": "node tests/run-vscode.cjs"
+  },
+  "devDependencies": { "typescript": "5.8.3" }
+}
