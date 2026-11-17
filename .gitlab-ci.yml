@@ -1,0 +1,24 @@
+# GitHub is canonical; this private GitLab mirror runs CI on our imac runner.
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_COMMIT_BRANCH
+
+default:
+  tags: [local-windows, imac]
+  interruptible: true
+
+stages: [test]
+
+verify:
+  stage: test
+  timeout: 15m
+  script:
+    - $ErrorActionPreference = 'Stop'
+    - $env:PATH = 'C:\Program Files\nodejs;' + $env:PATH
+    - '& node.exe --version'
+    - if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    - '& npm.cmd ci'
+    - if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    - '& npm.cmd run verify'
+    - if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
