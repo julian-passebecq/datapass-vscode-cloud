@@ -4,7 +4,7 @@ A standalone VS Code extension for Fabric, Power BI and Azure work: choose a goa
 
 ## Build and test
 - `npm run verify` (build, `node --test tests/*.test.cjs`, `scripts/check.cjs`). `npm run test:ui` and `npm run test:vscode` exercise the real renderer and host.
-- CI: the GitLab mirror `juliandatapass-group/datapass-vscode-cloud` has its jobs only on the mirror's own `main`, not on GitHub `main`, so a branch from GitHub runs no pipeline. Run `npm run verify` yourself and quote it, or bring the CI file over first.
+- CI: `.gitlab-ci.yml` runs `npm ci` and `npm run verify` on the `local-windows, imac` runner for branch pushes to the private GitLab mirror `juliandatapass-group/datapass-vscode-cloud`. Push branches to GitHub and GitLab; quote the exact-head pipeline link in the GitHub PR because GitLab results are not GitHub checks. Renderer and native VS Code tests remain separate qualification steps.
 
 ## Guidelines
 - Live cloud writes stay off and show as NOT EXECUTED; no automatic imports or deployment. Users point it at real tenants.
